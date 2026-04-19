@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Утренняя Практика</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500&family=IM+Fell+English:ital@0;1&display=swap');
+
+  :root {
+    --bg: #0a0c0f;
+    --gold: #c9a96e;
+    --gold-light: #f0d898;
+    --gold-dim: #9a8050;
+    --cream: #f8f2e8;
+    --cream-dim: #d8ccba;
+    --text: #f0ead8;
+    --text-bright: #faf6ee;
+    --accent: #80b8e0;
+    --quote-text: #eae0cc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .ambient {
+    position: fixed; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 80%, rgba(74,106,138,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 80% 20%, rgba(201,169,110,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 80% at 50% 50%, rgba(15,18,24,0.9) 0%, var(--bg) 100%);
+  }
+
+  .stars {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 15% 25%, rgba(201,169,110,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 15%, rgba(201,169,110,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 70%, rgba(201,169,110,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 85%, rgba(201,169,110,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 45%, rgba(201,169,110,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 55%, rgba(240,232,216,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 10% 90%, rgba(240,232,216,0.2) 0%, transparent 100%);
+  }
+
+  .container {
+    position: relative; z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  /* ── START ── */
+  #startScreen { text-align: center; max-width: 480px; }
+
+  .ornament { color: var(--gold); font-size: 1.4rem; letter-spacing: 0.5rem; margin-bottom: 16px; opacity: 0.8; }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    font-weight: 400;
+    color: var(--gold-light);
+    letter-spacing: 0.15em;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--cream-dim);
+    margin-bottom: 36px;
+    letter-spacing: 0.05em;
+  }
+
+  .steps-preview { display: flex; flex-direction: column; gap: 9px; margin-bottom: 36px; text-align: left; }
+
+  .step-preview-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
+    background: rgba(201,169,110,0.05);
+    border: 1px solid rgba(201,169,110,0.15);
+    border-radius: 2px;
+  }
+
+  .step-num { font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--gold); min-width: 20px; }
+  .step-title-preview { font-size: 0.95rem; color: var(--cream); letter-spacing: 0.04em; }
+  .step-time { margin-left: auto; font-size: 0.8rem; color: var(--gold-dim); font-style: italic; }
+
+  .start-btn {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    padding: 16px 48px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .start-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(201,169,110,0.08);
+    transform: scaleX(0); transition: transform 0.3s ease;
+  }
+  .start-btn:hover::before { transform: scaleX(1); }
+  .start-btn:hover { box-shadow: 0 0 30px rgba(201,169,110,0.2); }
+  .duration-note { margin-top: 14px; font-size: 0.82rem; color: var(--cream-dim); font-style: italic; }
+
+  /* ── PRACTICE ── */
+  #practiceScreen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 580px;
+  }
+
+  .progress-steps { display: flex; justify-content: space-between; width: 100%; margin-bottom: 26px; }
+  .prog-step {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(201,169,110,0.2);
+    border: 1px solid rgba(201,169,110,0.3);
+    transition: all 0.5s ease;
+  }
+  .prog-step.active { background: var(--gold); box-shadow: 0 0 12px var(--gold); transform: scale(1.3); }
+  .prog-step.done { background: var(--gold-dim); }
+
+  .step-card { width: 100%; text-align: center; animation: fadeInUp 0.8s ease forwards; }
+
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+
+  .step-badge { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.3em; color: var(--gold-dim); margin-bottom: 10px; text-transform: uppercase; }
+  .step-heading { font-family: 'Cinzel', serif; font-size: clamp(1.3rem, 4vw, 1.9rem); font-weight: 400; color: var(--gold-light); letter-spacing: 0.1em; margin-bottom: 20px; line-height: 1.4; white-space: pre-line; }
+
+  .orb-wrap { position: relative; width: 120px; height: 120px; margin: 0 auto 20px; }
+  .orb {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(201,169,110,0.3), rgba(74,106,138,0.15), transparent 70%);
+    border: 1px solid rgba(201,169,110,0.25);
+    display: flex; align-items: center; justify-content: center; position: relative;
+  }
+  .orb-inner {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(201,169,110,0.5), rgba(201,169,110,0.1));
+    border: 1px solid rgba(201,169,110,0.4);
+    display: flex; align-items: center; justify-content: center; font-size: 1.7rem;
+  }
+  .orb-ring { position: absolute; inset: -8px; border-radius: 50%; border: 1px solid rgba(201,169,110,0.12); animation: orbRing 3s ease-in-out infinite; }
+  .orb-ring2 { position: absolute; inset: -18px; border-radius: 50%; border: 1px solid rgba(201,169,110,0.07); animation: orbRing 3s ease-in-out infinite 1s; }
+  @keyframes orbRing { 0%,100%{transform:scale(1);opacity:0.6} 50%{transform:scale(1.05);opacity:1} }
+  .orb.breathing { animation: breathe 4s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{transform:scale(1);box-shadow:0 0 20px rgba(201,169,110,0.1)} 50%{transform:scale(1.08);box-shadow:0 0 40px rgba(201,169,110,0.25)} }
+  .orb.pulsing { animation: pulse2 2s ease-in-out infinite; }
+  @keyframes pulse2 { 0%,100%{box-shadow:0 0 20px rgba(74,106,138,0.2)} 50%{box-shadow:0 0 50px rgba(74,106,138,0.4),0 0 80px rgba(201,169,110,0.15)} }
+
+  .timer-display { font-family: 'Cinzel', serif; font-size: 2.8rem; color: var(--gold-light); letter-spacing: 0.1em; margin: 10px 0 5px; text-shadow: 0 0 30px rgba(201,169,110,0.4); }
+  .timer-label { font-size: 0.72rem; color: var(--cream-dim); letter-spacing: 0.15em; text-transform: uppercase; }
+
+  .phase-label { font-size: 0.92rem; color: var(--accent); letter-spacing: 0.08em; margin: 8px 0 18px; font-style: italic; min-height: 1.4em; }
+
+  .speaking-dots { display: inline-flex; gap: 5px; align-items: center; margin-left: 8px; }
+  .speaking-dots span { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; animation: dot 1.4s ease-in-out infinite; }
+  .speaking-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .speaking-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dot { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+
+  .step-content { max-height: 52vh; overflow-y: auto; width: 100%; padding-right: 4px; scrollbar-width: thin; scrollbar-color: rgba(201,169,110,0.2) transparent; }
+
+  .instruction-box { background: rgba(201,169,110,0.04); border: 1px solid rgba(201,169,110,0.15); border-radius: 2px; padding: 16px 20px; margin-bottom: 16px; text-align: left; }
+  .instruction-label { font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.25em; color: var(--gold); text-transform: uppercase; margin-bottom: 9px; }
+  .instruction-text { font-size: 1.05rem; line-height: 1.8; color: var(--text-bright); font-weight: 300; }
+
+  .quote-box { border-left: 2px solid rgba(201,169,110,0.35); padding: 13px 18px; margin-bottom: 13px; text-align: left; animation: fadeIn 1s ease forwards; opacity: 0; }
+  @keyframes fadeIn { to { opacity: 1; } }
+  .quote-text { font-family: 'IM Fell English', serif; font-style: italic; font-size: 1rem; color: var(--quote-text); line-height: 1.75; margin-bottom: 6px; }
+  .quote-author { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.18em; color: var(--gold); text-transform: uppercase; }
+
+  .controls { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; justify-content: center; }
+  .ctrl-btn {
+    background: transparent; border: 1px solid rgba(201,169,110,0.35);
+    color: var(--cream-dim); font-family: 'Cinzel', serif; font-size: 0.72rem;
+    letter-spacing: 0.15em; padding: 11px 24px; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase;
+  }
+  .ctrl-btn:hover { border-color: var(--gold); color: var(--gold-light); box-shadow: 0 0 18px rgba(201,169,110,0.12); }
+
+  /* ── SILENCE ── */
+  .silence-overlay {
+    display: none; position: fixed; inset: 0; z-index: 50;
+    background: rgba(8,10,13,0.95);
+    flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; backdrop-filter: blur(6px);
+  }
+  .silence-overlay.active { display: flex; }
+  .silence-timer { font-family: 'Cinzel', serif; font-size: 4.5rem; color: var(--gold-light); text-shadow: 0 0 40px rgba(201,169,110,0.5); margin-bottom: 14px; }
+  .silence-label { font-family: 'IM Fell English', serif; font-style: italic; font-size: 1.2rem; color: var(--cream); margin-bottom: 38px; line-height: 1.65; }
+  .wave-wrap { display: flex; gap: 6px; align-items: flex-end; height: 40px; margin-bottom: 38px; }
+  .wave-bar { width: 4px; background: var(--gold); border-radius: 2px; opacity: 0.45; animation: wave 1.4s ease-in-out infinite; }
+  .wave-bar:nth-child(1){animation-delay:0s;height:15px}
+  .wave-bar:nth-child(2){animation-delay:.1s;height:28px}
+  .wave-bar:nth-child(3){animation-delay:.2s;height:40px}
+  .wave-bar:nth-child(4){animation-delay:.3s;height:28px}
+  .wave-bar:nth-child(5){animation-delay:.4s;height:20px}
+  .wave-bar:nth-child(6){animation-delay:.5s;height:32px}
+  .wave-bar:nth-child(7){animation-delay:.6s;height:18px}
+  @keyframes wave { 0%,100%{transform:scaleY(0.4);opacity:0.3} 50%{transform:scaleY(1);opacity:0.75} }
+
+  /* ── COMPLETE ── */
+  #completeScreen { display: none; text-align: center; max-width: 480px; }
+  .complete-icon { font-size: 3rem; margin-bottom: 20px; animation: glow 2s ease-in-out infinite; }
+  @keyframes glow { 0%,100%{text-shadow:0 0 20px rgba(201,169,110,0.4)} 50%{text-shadow:0 0 50px rgba(201,169,110,0.8)} }
+  .complete-title { font-family: 'Cinzel', serif; font-size: 1.7rem; color: var(--gold-light); letter-spacing: 0.15em; margin-bottom: 14px; }
+  .complete-text { font-size: 1.1rem; color: var(--cream); font-style: italic; line-height: 1.8; margin-bottom: 32px; }
+
+  /* Gong flash */
+  .gong-flash { position: fixed; inset: 0; z-index: 100; background: radial-gradient(circle at 50% 50%, rgba(201,169,110,0.3), transparent 70%); pointer-events: none; opacity: 0; }
+  @keyframes gongFlash { 0%{opacity:1} 100%{opacity:0} }
+
+  /* Volume */
+  .volume-wrap { position: fixed; top: 18px; right: 18px; z-index: 20; display: flex; align-items: center; gap: 8px; }
+  .vol-icon { font-size: 1rem; color: var(--gold-dim); cursor: pointer; padding: 4px; }
+  input[type=range].vol-slider { width: 80px; accent-color: var(--gold); opacity: 0.6; cursor: pointer; }
+  input[type=range].vol-slider:hover { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+<div class="stars"></div>
+<div class="gong-flash" id="gongFlash"></div>
+
+<div class="volume-wrap">
+  <span class="vol-icon" id="volIcon">🔔</span>
+  <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.05" value="0.7">
+</div>
+
+<!-- Silence overlay -->
+<div class="silence-overlay" id="silenceOverlay">
+  <div class="silence-timer" id="silenceTimer">3:00</div>
+  <div class="silence-label">Тишина.<br>Оставайтесь в своём состоянии.</div>
+  <div class="wave-wrap">
+    <div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div>
+  </div>
+  <button class="ctrl-btn" onclick="skipSilence()">Продолжить →</button>
+</div>
+
+<div class="container">
+
+  <!-- START -->
+  <div id="startScreen">
+    <div class="ornament">✦ ✦ ✦</div>
+    <h1>Утренняя<br>Практика</h1>
+    <p class="subtitle">5 шагов к новому состоянию</p>
+
+    <div class="steps-preview">
+      <div class="step-preview-item"><span class="step-num">I</span><span class="step-title-preview">Дыхание — перезагрузка</span><span class="step-time">2 мин</span></div>
+      <div class="step-preview-item"><span class="step-num">II</span><span class="step-title-preview">Сердечная когерентность</span><span class="step-time">3 мин</span></div>
+      <div class="step-preview-item"><span class="step-num">III</span><span class="step-title-preview">Декларация идентичности</span><span class="step-time">3 мин</span></div>
+      <div class="step-preview-item"><span class="step-num">IV</span><span class="step-title-preview">Защита состояния</span><span class="step-time">2 мин</span></div>
+      <div class="step-preview-item"><span class="step-num">V</span><span class="step-title-preview">Поиск подтверждений</span><span class="step-time">3 мин</span></div>
+    </div>
+
+    <button class="start-btn" onclick="startPractice()">НАЧАТЬ ПРАКТИКУ</button>
+    <p class="duration-note">~ 13 минут · голос ElevenLabs</p>
+  </div>
+
+  <!-- PRACTICE -->
+  <div id="practiceScreen">
+    <div class="progress-steps">
+      <div class="prog-step" id="ps0"></div>
+      <div class="prog-step" id="ps1"></div>
+      <div class="prog-step" id="ps2"></div>
+      <div class="prog-step" id="ps3"></div>
+      <div class="prog-step" id="ps4"></div>
+    </div>
+
+    <div class="step-card" id="stepCard">
+      <div class="step-badge" id="stepBadge">ШАГ I · 5</div>
+      <div class="step-heading" id="stepHeading">—</div>
+
+      <div class="orb-wrap">
+        <div class="orb" id="mainOrb">
+          <div class="orb-inner" id="orbInner">—</div>
+          <div class="orb-ring"></div>
+          <div class="orb-ring2"></div>
+        </div>
+      </div>
+
+      <div class="timer-label">ОСТАЛОСЬ</div>
+      <div class="timer-display" id="timerDisplay">0:00</div>
+      <div class="phase-label" id="phaseLabel">—</div>
+
+      <div class="step-content">
+        <div class="instruction-box">
+          <div class="instruction-label">Инструкция</div>
+          <div class="instruction-text" id="instructionText"></div>
+        </div>
+        <div id="quotesArea"></div>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl-btn" id="pauseBtn" onclick="togglePause()">ПАУЗА</button>
+        <button class="ctrl-btn" onclick="skipStep()">ПРОПУСТИТЬ →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLETE -->
+  <div id="completeScreen">
+    <div class="complete-icon">✦</div>
+    <div class="complete-title">Практика завершена</div>
+    <p class="complete-text">Вы сделали шаг к новой версии себя.<br>Несите это состояние через весь день.</p>
+    <div class="ornament" style="margin-bottom:32px;">· · ·</div>
+    <button class="start-btn" onclick="resetApp()">НАЧАТЬ СНОВА</button>
+  </div>
+</div>
+
+<script>
+const STEPS = [
+  {
+    number:"I", title:"Дыхание\nПерезагрузка нервной системы", icon:"🌬", orbClass:"breathing",
+    duration:120, silenceDuration:60,
+    instruction:"Сядьте удобно. Закройте глаза. Сделайте вдох через нос — задержите — короткий дополнительный вдох — и медленный долгий выдох через рот. Вы переключаетесь из режима стресса в режим открытости.",
+    audioFiles:[
+      "audio/s1_marina_01.mp3","audio/s1_marina_02.mp3","audio/s1_marina_03.mp3",
+      "audio/s1_marina_04.mp3","audio/s1_marina_05.mp3","audio/s1_marina_06.mp3",
+      "audio/s1_marina_07.mp3","audio/s1_marina_08.mp3","audio/s1_marina_09.mp3",
+      "audio/s1_maxim_01.mp3","audio/s1_maxim_02.mp3","audio/s1_maxim_03.mp3"
+    ],
+    quotes:[
+      {text:"Закройте глаза и сделайте несколько медленных, глубоких вздохов — чтобы расслабить разум и тело.", author:"Джо Диспенза · Сила подсознания"},
+      {text:"Двойной вдох через нос, длинный полный выдох — и вы переключаетесь с симпатической системы на парасимпатическую.", author:"Эндрю Хаберман · Huberman Lab"},
+      {text:"Я хочу отпустить. Я освобождаю. Я избавляюсь от напряжения.", author:"Луиза Хей · Исцели свою жизнь"}
+    ]
+  },
+  {
+    number:"II", title:"Сердечная\nКогерентность", icon:"❤", orbClass:"pulsing",
+    duration:180, silenceDuration:90,
+    instruction:"Перенесите внимание в центр груди. Дышите медленно через сердце. Вспомните момент настоящей благодарности или любви. Позвольте этому чувству расшириться. Удерживайте его.",
+    audioFiles:[
+      "audio/s2_marina_01.mp3","audio/s2_marina_02.mp3","audio/s2_marina_03.mp3",
+      "audio/s2_marina_04.mp3","audio/s2_marina_05.mp3","audio/s2_marina_06.mp3",
+      "audio/s2_maxim_01.mp3","audio/s2_maxim_02.mp3","audio/s2_maxim_03.mp3"
+    ],
+    quotes:[
+      {text:"Сердечная когерентность начинается с поддержания возвышенных чувств — благодарности, признательности, вдохновения, сострадания, любви и радости.", author:"Джо Диспенза · Сверхъестественный разум"},
+      {text:"Чувство — ключ к молитве, поскольку только чувство способно войти в резонанс с окружающим миром.", author:"Грэг Брейден · Эффект Исайи"},
+      {text:"Если внушу себе, что мир пронизан любовью, я люблю и способна вызвать ответное чувство.", author:"Луиза Хей · Исцели свою жизнь"}
+    ]
+  },
+  {
+    number:"III", title:"Декларация\nНовой Идентичности", icon:"✦", orbClass:"",
+    duration:180, silenceDuration:90,
+    instruction:"Из состояния тепла и открытости произнесите вслух одну сильную декларацию. Не кем вы хотите стать — а кем вы уже являетесь прямо сейчас. Прочувствуйте каждое слово.",
+    audioFiles:[
+      "audio/s3_marina_01.mp3","audio/s3_marina_02.mp3","audio/s3_marina_03.mp3",
+      "audio/s3_marina_04.mp3","audio/s3_marina_05.mp3","audio/s3_marina_06.mp3",
+      "audio/s3_maxim_01.mp3","audio/s3_maxim_02.mp3","audio/s3_maxim_03.mp3"
+    ],
+    quotes:[
+      {text:"Создание новой личности невозможно без решения стать другим человеком. Снова и снова репетируйте будущее в мыслях, пока оно запечатлеется как новые нейронные связи.", author:"Джо Диспенза · Сила подсознания"},
+      {text:"Фокус всегда должен быть на той личности, какой вы хотите стать. Каждое действие — это голос за того человека, которым вы хотите стать.", author:"Джеймс Клир · Атомные привычки"},
+      {text:"Главное в нашей жизни — мысль, а мысль всегда можно изменить.", author:"Луиза Хей · Исцели свою жизнь"}
+    ]
+  },
+  {
+    number:"IV", title:"Защита\nСостояния", icon:"🛡", orbClass:"",
+    duration:120, silenceDuration:60,
+    instruction:"Представьте свой предстоящий день. Увидьте себя — уже в новом состоянии — в каждой встрече, каждом разговоре. Установите намерение: при любом отклонении вы возвращаетесь к себе.",
+    audioFiles:[
+      "audio/s4_marina_01.mp3","audio/s4_marina_02.mp3","audio/s4_marina_03.mp3",
+      "audio/s4_marina_04.mp3","audio/s4_marina_05.mp3","audio/s4_marina_06.mp3",
+      "audio/s4_maxim_01.mp3","audio/s4_maxim_02.mp3","audio/s4_maxim_03.mp3"
+    ],
+    quotes:[
+      {text:"Чем более осознанны вы к состояниям тела и ума, тем реже вы будете действовать на автопилоте. Привычная мысль уже не проскользнёт незамеченной.", author:"Джо Диспенза · Сила подсознания"},
+      {text:"Всегда говорите «Да» текущему мгновению. Скажите жизни «да» — и вы увидите, как она начнёт работать на вас.", author:"Экхарт Толле · Сила настоящего"},
+      {text:"Никогда не пропускайте действие дважды. Если пропускаете один день — вернитесь к привычке как можно скорее.", author:"Джеймс Клир · Атомные привычки"}
+    ]
+  },
+  {
+    number:"V", title:"Поиск\nПодтверждений", icon:"🌟", orbClass:"",
+    duration:180, silenceDuration:90,
+    instruction:"Активируйте режим поиска. Сегодня вы будете замечать всё, что подтверждает вашу новую идентичность. Мозг начинает видеть то, во что вы верите. Завершите тремя словами благодарности.",
+    audioFiles:[
+      "audio/s5_marina_01.mp3","audio/s5_marina_02.mp3","audio/s5_marina_03.mp3",
+      "audio/s5_marina_04.mp3","audio/s5_marina_05.mp3","audio/s5_marina_06.mp3",
+      "audio/s5_maxim_01.mp3","audio/s5_maxim_02.mp3","audio/s5_maxim_03.mp3"
+    ],
+    quotes:[
+      {text:"Испытывая благодарность, мы сигнализируем, что событие уже произошло. Нужно чувствовать себя так, словно то, чего мы хотим, уже присутствует в нашей жизни.", author:"Джо Диспенза · Сила подсознания"},
+      {text:"Вы в своей жизни видите главным образом то, во что верите.", author:"Уэйн Дайер · Когда поверишь, тогда увидишь"},
+      {text:"Меняя то, что происходит внутри нас — мысли, чувства и убеждения — мы меняем и окружающий мир.", author:"Грэг Брейден · Коды сознания"}
+    ]
+  }
+];
+
+const FINISH_AUDIO = ["audio/finish_01.mp3","audio/finish_02.mp3","audio/finish_03.mp3"];
+
+// ════════════════════════════════════
+// AUDIO ENGINE
+// ════════════════════════════════════
+let audioCtx=null, gainNode=null, masterGain=null, ambiOsc=null, ambiLfo=null;
+let volume=0.7;
+
+function initAudio(){
+  if(audioCtx) return;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  masterGain=audioCtx.createGain();
+  masterGain.gain.value=volume;
+  masterGain.connect(audioCtx.destination);
+}
+
+function playGong(){
+  if(!audioCtx) initAudio();
+  const flash=document.getElementById('gongFlash');
+  flash.style.animation='none'; void flash.offsetWidth;
+  flash.style.animation='gongFlash 1.8s ease-out forwards';
+  const now=audioCtx.currentTime;
+  [[110,88,0.45,5],[220,205,0.28,3.5],[550,550,0.1,2]].forEach(([f1,f2,g,dur])=>{
+    const o=audioCtx.createOscillator(), gn=audioCtx.createGain();
+    o.type='sine'; o.frequency.setValueAtTime(f1,now); o.frequency.exponentialRampToValueAtTime(f2,now+0.1);
+    gn.gain.setValueAtTime(0,now); gn.gain.linearRampToValueAtTime(g,now+0.02); gn.gain.exponentialRampToValueAtTime(0.001,now+dur);
+    o.connect(gn); gn.connect(masterGain); o.start(now); o.stop(now+dur);
+  });
+}
+
+function startAmbience(){
+  if(!audioCtx) initAudio();
+  stopAmbience();
+  const osc=audioCtx.createOscillator();
+  const lfo=audioCtx.createOscillator();
+  const lfoG=audioCtx.createGain();
+  gainNode=audioCtx.createGain();
+  osc.type='sine'; osc.frequency.value=136.1;
+  lfo.type='sine'; lfo.frequency.value=0.08; lfoG.gain.value=2;
+  lfo.connect(lfoG); lfoG.connect(osc.frequency);
+  gainNode.gain.value=0; osc.connect(gainNode); gainNode.connect(masterGain);
+  osc.start(); lfo.start(); gainNode.gain.linearRampToValueAtTime(0.05,audioCtx.currentTime+4);
+  ambiOsc=osc; ambiLfo=lfo;
+}
+
+function stopAmbience(){
+  if(ambiOsc){
+    try{
+      gainNode.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1.5);
+      const o=ambiOsc, l=ambiLfo;
+      setTimeout(()=>{try{o.stop();l.stop();}catch(e){}},1600);
+    }catch(e){}
+    ambiOsc=null; ambiLfo=null;
+  }
+}
+
+// ════════════════════════════════════
+// PLAYBACK
+// ════════════════════════════════════
+let currentAudio=null, isSpeaking=false, isPaused=false;
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+async function speakOne(filePath){
+  return new Promise(resolve=>{
+    const audio=new Audio(filePath);
+    audio.volume=volume;
+    currentAudio=audio;
+    audio.onended=resolve;
+    audio.onerror=resolve;
+    audio.play().catch(resolve);
+  });
+}
+
+async function speakQueue(files, onDone){
+  isSpeaking=true;
+  for(let i=0;i<files.length;i++){
+    if(!isSpeaking) break;
+    while(isPaused){ await sleep(250); }
+    setPhaseLabel('Слушайте...', true);
+    await speakOne(files[i]);
+    if(!isSpeaking) break;
+    await sleep(800);
+  }
+  isSpeaking=false;
+  if(onDone) onDone();
+}
+
+function stopSpeech(){
+  isSpeaking=false;
+  if(currentAudio){ try{currentAudio.pause(); currentAudio.currentTime=0;}catch(e){} }
+}
+
+// ════════════════════════════════════
+// APP STATE
+// ════════════════════════════════════
+let currentStep=0, stepTimer=null, silTimer=null;
+let stepTimeLeft=0, silTimeLeft=0, inSilence=false;
+
+function startPractice(){
+  initAudio();
+  document.getElementById('startScreen').style.display='none';
+  const ps=document.getElementById('practiceScreen');
+  ps.style.display='flex'; ps.style.flexDirection='column'; ps.style.alignItems='center';
+  currentStep=0; loadStep(0);
+}
+
+function loadStep(idx){
+  if(idx>=STEPS.length){ finishPractice(); return; }
+  isPaused=false; inSilence=false;
+  document.getElementById('pauseBtn').textContent='ПАУЗА';
+  const step=STEPS[idx];
+
+  for(let i=0;i<5;i++){
+    const d=document.getElementById('ps'+i);
+    d.className='prog-step';
+    if(i<idx) d.classList.add('done');
+    if(i===idx) d.classList.add('active');
+  }
+
+  document.getElementById('stepBadge').textContent=`ШАГ ${step.number} · ${STEPS.length}`;
+  document.getElementById('stepHeading').textContent=step.title;
+  document.getElementById('instructionText').textContent=step.instruction;
+
+  const orb=document.getElementById('mainOrb');
+  orb.className='orb'; if(step.orbClass) orb.classList.add(step.orbClass);
+  document.getElementById('orbInner').textContent=step.icon;
+
+  const qa=document.getElementById('quotesArea'); qa.innerHTML='';
+  step.quotes.forEach((q,i)=>{
+    const div=document.createElement('div');
+    div.className='quote-box'; div.style.animationDelay=(0.5+i*0.5)+'s';
+    div.innerHTML=`<div class="quote-text">"${q.text}"</div><div class="quote-author">— ${q.author}</div>`;
+    qa.appendChild(div);
+  });
+
+  const card=document.getElementById('stepCard');
+  card.style.animation='none'; void card.offsetWidth;
+  card.style.animation='fadeInUp 0.8s ease forwards';
+
+  stepTimeLeft=step.duration; updateTimerDisplay(stepTimeLeft);
+  setPhaseLabel('Подготовка...');
+
+  if(idx>0){ playGong(); setTimeout(()=>runStep(step), 2800); }
+  else runStep(step);
+}
+
+function runStep(step){
+  startAmbience();
+  clearInterval(stepTimer);
+  stepTimer=setInterval(()=>{ if(!isPaused){ stepTimeLeft=Math.max(0,stepTimeLeft-1); updateTimerDisplay(stepTimeLeft); } },1000);
+  speakQueue(step.audioFiles, ()=>{
+    if(!inSilence){ setPhaseLabel('Погружение в тишину...'); setTimeout(()=>beginSilence(step.silenceDuration),1000); }
+  });
+}
+
+function beginSilence(duration){
+  inSilence=true; silTimeLeft=duration;
+  clearInterval(stepTimer);
+  updateSilenceDisplay(silTimeLeft);
+  document.getElementById('silenceOverlay').classList.add('active');
+  setPhaseLabel('Тишина...');
+  clearInterval(silTimer);
+  silTimer=setInterval(()=>{
+    if(isPaused) return;
+    silTimeLeft--; updateSilenceDisplay(silTimeLeft);
+    if(silTimeLeft<=0){ clearInterval(silTimer); endSilence(); }
+  },1000);
+}
+
+function endSilence(){
+  inSilence=false;
+  document.getElementById('silenceOverlay').classList.remove('active');
+  stopAmbience(); clearInterval(silTimer); clearInterval(stepTimer);
+  currentStep++;
+  if(currentStep<STEPS.length){ setPhaseLabel('Следующий шаг...'); playGong(); setTimeout(()=>loadStep(currentStep),3000); }
+  else finishPractice();
+}
+
+function skipSilence(){ clearInterval(silTimer); endSilence(); }
+
+function skipStep(){
+  clearInterval(stepTimer); clearInterval(silTimer);
+  stopSpeech(); stopAmbience();
+  document.getElementById('silenceOverlay').classList.remove('active');
+  inSilence=false; currentStep++;
+  if(currentStep<STEPS.length){ playGong(); setTimeout(()=>loadStep(currentStep),2500); }
+  else finishPractice();
+}
+
+function togglePause(){
+  isPaused=!isPaused;
+  const btn=document.getElementById('pauseBtn');
+  if(isPaused){
+    btn.textContent='ПРОДОЛЖИТЬ';
+    if(currentAudio) currentAudio.pause();
+    if(gainNode) gainNode.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.5);
+    setPhaseLabel('Пауза');
+  } else {
+    btn.textContent='ПАУЗА';
+    if(currentAudio) currentAudio.play();
+    if(gainNode) gainNode.gain.linearRampToValueAtTime(0.05,audioCtx.currentTime+0.5);
+    setPhaseLabel('Продолжаем...');
+  }
+}
+
+function finishPractice(){
+  clearInterval(stepTimer); clearInterval(silTimer);
+  stopSpeech(); stopAmbience();
+  document.getElementById('practiceScreen').style.display='none';
+  const cs=document.getElementById('completeScreen');
+  cs.style.display='block'; cs.style.animation='fadeInUp 1s ease forwards';
+  playGong();
+  setTimeout(()=>speakQueue(FINISH_AUDIO), 2800);
+}
+
+function resetApp(){
+  stopSpeech(); stopAmbience(); clearInterval(stepTimer); clearInterval(silTimer);
+  document.getElementById('completeScreen').style.display='none';
+  document.getElementById('practiceScreen').style.display='none';
+  document.getElementById('startScreen').style.display='block';
+  currentStep=0; isPaused=false; inSilence=false;
+}
+
+function setPhaseLabel(text, dots){
+  const el=document.getElementById('phaseLabel');
+  el.innerHTML=dots ? text+'<span class="speaking-dots"><span></span><span></span><span></span></span>' : text;
+}
+function updateTimerDisplay(s){ const m=Math.floor(s/60),sc=s%60; document.getElementById('timerDisplay').textContent=`${m}:${sc.toString().padStart(2,'0')}`; }
+function updateSilenceDisplay(s){ const m=Math.floor(s/60),sc=s%60; document.getElementById('silenceTimer').textContent=`${m}:${sc.toString().padStart(2,'0')}`; }
+
+document.getElementById('volSlider').addEventListener('input',function(){
+  volume=parseFloat(this.value);
+  if(masterGain) masterGain.gain.value=volume;
+  if(currentAudio) currentAudio.volume=volume;
+  document.getElementById('volIcon').textContent=volume===0?'🔇':volume<0.35?'🔉':'🔔';
+});
+document.getElementById('volIcon').addEventListener('click',function(){
+  const sl=document.getElementById('volSlider');
+  if(volume>0){sl.dataset.prev=volume;sl.value=0;volume=0;}
+  else{volume=parseFloat(sl.dataset.prev||0.7);sl.value=volume;}
+  if(masterGain) masterGain.gain.value=volume;
+  if(currentAudio) currentAudio.volume=volume;
+  this.textContent=volume===0?'🔇':'🔔';
+});
+</script>
+</body>
+</html>
