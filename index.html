@@ -27,7 +27,6 @@
     color: var(--text);
     font-family: 'Cormorant Garamond', Georgia, serif;
     min-height: 100vh;
-    overflow: hidden;
   }
 
   .ambient {
@@ -57,12 +56,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 20px;
+    justify-content: flex-start;
+    padding: 80px 20px 40px;
   }
 
   /* ── START ── */
-  #startScreen { text-align: center; max-width: 480px; }
+  #startScreen { text-align: center; max-width: 480px; width: 100%; }
 
   .ornament { color: var(--gold); font-size: 1.4rem; letter-spacing: 0.5rem; margin-bottom: 16px; opacity: 0.8; }
 
@@ -194,7 +193,7 @@
   .speaking-dots span:nth-child(3) { animation-delay: 0.4s; }
   @keyframes dot { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
 
-  .step-content { max-height: 52vh; overflow-y: auto; width: 100%; padding-right: 4px; scrollbar-width: thin; scrollbar-color: rgba(201,169,110,0.2) transparent; }
+  .step-content { width: 100%; }
 
   .instruction-box { background: rgba(201,169,110,0.04); border: 1px solid rgba(201,169,110,0.15); border-radius: 2px; padding: 16px 20px; margin-bottom: 16px; text-align: left; }
   .instruction-label { font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.25em; color: var(--gold); text-transform: uppercase; margin-bottom: 9px; }
@@ -246,7 +245,7 @@
   @keyframes gongFlash { 0%{opacity:1} 100%{opacity:0} }
 
   /* Volume */
-  .volume-wrap { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 8px; }
+  .volume-wrap { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 8px; }
   .vol-label { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--gold-dim); text-transform: uppercase; }
   .vol-icon { font-size: 1rem; color: var(--gold-dim); cursor: pointer; padding: 4px; }
   input[type=range].vol-slider { width: 80px; accent-color: var(--gold); opacity: 0.6; cursor: pointer; }
