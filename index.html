@@ -246,10 +246,22 @@
   @keyframes gongFlash { 0%{opacity:1} 100%{opacity:0} }
 
   /* Volume */
-  .volume-wrap { position: fixed; top: 18px; right: 18px; z-index: 20; display: flex; align-items: center; gap: 8px; }
+  .volume-wrap { position: fixed; top: 18px; right: 18px; z-index: 20; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .vol-row { display: flex; align-items: center; gap: 8px; }
   .vol-icon { font-size: 1rem; color: var(--gold-dim); cursor: pointer; padding: 4px; }
+  .vol-label { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--gold-dim); text-transform: uppercase; }
   input[type=range].vol-slider { width: 80px; accent-color: var(--gold); opacity: 0.6; cursor: pointer; }
   input[type=range].vol-slider:hover { opacity: 1; }
+
+  /* Quotes toggle */
+  .quotes-toggle-wrap { margin-bottom: 24px; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(201,169,110,0.04); border: 1px solid rgba(201,169,110,0.15); border-radius: 2px; }
+  .quotes-toggle-label { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.18em; color: var(--cream-dim); text-transform: uppercase; }
+  .toggle-switch { position: relative; width: 44px; height: 24px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; inset: 0; background: rgba(201,169,110,0.15); border: 1px solid rgba(201,169,110,0.3); border-radius: 24px; cursor: pointer; transition: 0.3s; }
+  .toggle-slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: var(--gold-dim); border-radius: 50%; transition: 0.3s; }
+  .toggle-switch input:checked + .toggle-slider { background: rgba(201,169,110,0.25); border-color: var(--gold); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); background: var(--gold-light); }
 </style>
 </head>
 <body>
@@ -259,8 +271,11 @@
 <div class="gong-flash" id="gongFlash"></div>
 
 <div class="volume-wrap">
-  <span class="vol-icon" id="volIcon">🔔</span>
-  <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.05" value="0.7">
+  <div class="vol-row">
+    <span class="vol-label">Stimme</span>
+    <span class="vol-icon" id="volIcon">🔔</span>
+    <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.05" value="0.85">
+  </div>
 </div>
 
 <!-- Silence overlay -->
@@ -304,6 +319,14 @@
           <span class="voice-desc">глубокий · мужской</span>
         </button>
       </div>
+    </div>
+
+    <div class="quotes-toggle-wrap">
+      <span class="quotes-toggle-label">Zitate vorlesen</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="quotesToggle" onchange="readQuotes=this.checked">
+        <span class="toggle-slider"></span>
+      </label>
     </div>
 
     <button class="start-btn" onclick="startPractice()">НАЧАТЬ ПРАКТИКУ</button>
@@ -367,7 +390,8 @@ const STEPS = [
     number:"I", title:"Дыхание\nПерезагрузка нервной системы", icon:"🌬", orbClass:"breathing",
     duration:120, silenceDuration:60, bgMusic:"audio/sigmamusicart-meditation-meditation-music-514539.mp3",
     instruction:"Сядьте удобно. Закройте глаза. Сделайте вдох через нос — задержите — короткий дополнительный вдох — и медленный долгий выдох через рот. Вы переключаетесь из режима стресса в режим открытости.",
-    audioFiles:["s1_01","s1_02","s1_03","s1_04","s1_05","s1_06","s1_07","s1_08","s1_09","s1_10","s1_11","s1_12"],
+    instructionFiles:["s1_01","s1_02","s1_03","s1_04","s1_05","s1_06","s1_07","s1_08","s1_09"],
+    quoteFiles:["s1_10","s1_11","s1_12"],
     quotes:[
       {text:"Закройте глаза и сделайте несколько медленных, глубоких вздохов — чтобы расслабить разум и тело.", author:"Джо Диспенза · Сила подсознания"},
       {text:"Двойной вдох через нос, длинный полный выдох — и вы переключаетесь с симпатической системы на парасимпатическую.", author:"Эндрю Хаберман · Huberman Lab"},
@@ -378,7 +402,8 @@ const STEPS = [
     number:"II", title:"Сердечная\nКогерентность", icon:"❤", orbClass:"pulsing",
     duration:180, silenceDuration:90, bgMusic:"audio/sigmamusicart-meditation-meditation-music-514539.mp3",
     instruction:"Перенесите внимание в центр груди. Дышите медленно через сердце. Вспомните момент настоящей благодарности или любви. Позвольте этому чувству расшириться. Удерживайте его.",
-    audioFiles:["s2_01","s2_02","s2_03","s2_04","s2_05","s2_06","s2_07","s2_08","s2_09"],
+    instructionFiles:["s2_01","s2_02","s2_03","s2_04","s2_05","s2_06"],
+    quoteFiles:["s2_07","s2_08","s2_09"],
     quotes:[
       {text:"Сердечная когерентность начинается с поддержания возвышенных чувств — благодарности, признательности, вдохновения, сострадания, любви и радости.", author:"Джо Диспенза · Сверхъестественный разум"},
       {text:"Чувство — ключ к молитве, поскольку только чувство способно войти в резонанс с окружающим миром.", author:"Грэг Брейден · Эффект Исайи"},
@@ -389,7 +414,8 @@ const STEPS = [
     number:"III", title:"Декларация\nНовой Идентичности", icon:"✦", orbClass:"",
     duration:180, silenceDuration:90, bgMusic:"audio/the_mountain-meditation-background-443554.mp3",
     instruction:"Из состояния тепла и открытости произнесите вслух одну сильную декларацию. Не кем вы хотите стать — а кем вы уже являетесь прямо сейчас. Прочувствуйте каждое слово.",
-    audioFiles:["s3_01","s3_02","s3_03","s3_04","s3_05","s3_06","s3_07","s3_08","s3_09"],
+    instructionFiles:["s3_01","s3_02","s3_03","s3_04","s3_05","s3_06"],
+    quoteFiles:["s3_07","s3_08","s3_09"],
     quotes:[
       {text:"Создание новой личности невозможно без решения стать другим человеком. Снова и снова репетируйте будущее в мыслях, пока оно запечатлеется как новые нейронные связи.", author:"Джо Диспенза · Сила подсознания"},
       {text:"Фокус всегда должен быть на той личности, какой вы хотите стать. Каждое действие — это голос за того человека, которым вы хотите стать.", author:"Джеймс Клир · Атомные привычки"},
@@ -400,7 +426,8 @@ const STEPS = [
     number:"IV", title:"Защита\nСостояния", icon:"🛡", orbClass:"",
     duration:120, silenceDuration:60, bgMusic:"audio/sigmamusicart-meditation-meditation-music-514539.mp3",
     instruction:"Представьте свой предстоящий день. Увидьте себя — уже в новом состоянии — в каждой встрече, каждом разговоре. Установите намерение: при любом отклонении вы возвращаетесь к себе.",
-    audioFiles:["s4_01","s4_02","s4_03","s4_04","s4_05","s4_06","s4_07","s4_08","s4_09"],
+    instructionFiles:["s4_01","s4_02","s4_03","s4_04","s4_05","s4_06"],
+    quoteFiles:["s4_07","s4_08","s4_09"],
     quotes:[
       {text:"Чем более осознанны вы к состояниям тела и ума, тем реже вы будете действовать на автопилоте. Привычная мысль уже не проскользнёт незамеченной.", author:"Джо Диспенза · Сила подсознания"},
       {text:"Всегда говорите «Да» текущему мгновению. Скажите жизни «да» — и вы увидите, как она начнёт работать на вас.", author:"Экхарт Толле · Сила настоящего"},
@@ -411,7 +438,8 @@ const STEPS = [
     number:"V", title:"Поиск\nПодтверждений", icon:"🌟", orbClass:"",
     duration:180, silenceDuration:90, bgMusic:"audio/sigmamusicart-meditation-meditation-music-514539.mp3",
     instruction:"Активируйте режим поиска. Сегодня вы будете замечать всё, что подтверждает вашу новую идентичность. Мозг начинает видеть то, во что вы верите. Завершите тремя словами благодарности.",
-    audioFiles:["s5_01","s5_02","s5_03","s5_04","s5_05","s5_06","s5_07","s5_08","s5_09"],
+    instructionFiles:["s5_01","s5_02","s5_03","s5_04","s5_05","s5_06"],
+    quoteFiles:["s5_07","s5_08","s5_09"],
     quotes:[
       {text:"Испытывая благодарность, мы сигнализируем, что событие уже произошло. Нужно чувствовать себя так, словно то, чего мы хотим, уже присутствует в нашей жизни.", author:"Джо Диспенза · Сила подсознания"},
       {text:"Вы в своей жизни видите главным образом то, во что верите.", author:"Уэйн Дайер · Когда поверишь, тогда увидишь"},
@@ -426,7 +454,7 @@ const FINISH_AUDIO = ["finish_01","finish_02","finish_03"];
 // AUDIO ENGINE
 // ════════════════════════════════════
 let audioCtx=null, masterGain=null;
-let volume=0.7;
+let volume=0.85;
 
 function initAudio(){
   if(audioCtx) return;
@@ -463,7 +491,7 @@ function startBgMusic(src){
   stopBgMusic();
   bgMusicAudio=new Audio(src);
   bgMusicAudio.loop=true;
-  bgMusicAudio.volume=0.3;
+  bgMusicAudio.volume=0.07;
   bgMusicAudio.play().catch(e=>console.warn('BgMusic error:',e));
 }
 
@@ -472,9 +500,10 @@ function stopBgMusic(){
 }
 
 // ════════════════════════════════════
-// VOICE SELECTION
+// VOICE SELECTION & SETTINGS
 // ════════════════════════════════════
 let selectedVoice='marina';
+let readQuotes=false;
 
 function selectVoice(voice){
   selectedVoice=voice;
@@ -580,7 +609,8 @@ function runStep(step){
   startBgMusic(step.bgMusic);
   clearInterval(stepTimer);
   stepTimer=setInterval(()=>{ if(!isPaused){ stepTimeLeft=Math.max(0,stepTimeLeft-1); updateTimerDisplay(stepTimeLeft); } },1000);
-  speakQueue(step.audioFiles, ()=>{
+  const files=readQuotes ? [...step.instructionFiles, ...step.quoteFiles] : step.instructionFiles;
+  speakQueue(files, ()=>{
     if(!inSilence){ setPhaseLabel('Погружение в тишину...'); setTimeout(()=>beginSilence(step.silenceDuration),1000); }
   });
 }
@@ -664,16 +694,14 @@ document.getElementById('volSlider').addEventListener('input',function(){
   volume=parseFloat(this.value);
   if(masterGain) masterGain.gain.value=volume;
   if(currentAudio) currentAudio.volume=volume;
-  if(bgMusicAudio) bgMusicAudio.volume=volume*0.2;
   document.getElementById('volIcon').textContent=volume===0?'🔇':volume<0.35?'🔉':'🔔';
 });
 document.getElementById('volIcon').addEventListener('click',function(){
   const sl=document.getElementById('volSlider');
   if(volume>0){sl.dataset.prev=volume;sl.value=0;volume=0;}
-  else{volume=parseFloat(sl.dataset.prev||0.7);sl.value=volume;}
+  else{volume=parseFloat(sl.dataset.prev||0.85);sl.value=volume;}
   if(masterGain) masterGain.gain.value=volume;
   if(currentAudio) currentAudio.volume=volume;
-  if(bgMusicAudio) bgMusicAudio.volume=volume*0.2;
   this.textContent=volume===0?'🔇':'🔔';
 });
 </script>
