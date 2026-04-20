@@ -458,6 +458,10 @@ function initAudio(){
   masterGain=audioCtx.createGain();
   masterGain.gain.value=1;
   masterGain.connect(audioCtx.destination);
+  // iOS unlock: play 1-frame silent buffer so all AudioContext audio works
+  const buf=audioCtx.createBuffer(1,1,22050);
+  const src=audioCtx.createBufferSource();
+  src.buffer=buf; src.connect(audioCtx.destination); src.start(0);
 }
 
 function playGong(){
@@ -509,19 +513,27 @@ function selectVoice(voice){
 // ════════════════════════════════════
 // PLAYBACK
 // ════════════════════════════════════
-let currentAudio=null, isSpeaking=false, isPaused=false;
+let currentSource=null, isSpeaking=false, isPaused=false;
 
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 async function speakOne(baseId){
-  return new Promise(resolve=>{
-    const src=`audio/${baseId}_${selectedVoice}.mp3`;
-    const audio=new Audio(src);
-    audio.volume=1.0;
-    currentAudio=audio;
-    audio.onended=resolve;
-    audio.onerror=(e)=>{ console.warn('Audio error:', src, e); resolve(); };
-    audio.play().catch(e=>{ console.warn('Play failed:', src, e); resolve(); });
+  const src=`audio/${baseId}_${selectedVoice}.mp3`;
+  return new Promise(async resolve=>{
+    try{
+      const resp=await fetch(src);
+      const arrayBuf=await resp.arrayBuffer();
+      const decoded=await audioCtx.decodeAudioData(arrayBuf);
+      const node=audioCtx.createBufferSource();
+      node.buffer=decoded;
+      node.connect(masterGain);
+      node.onended=resolve;
+      currentSource=node;
+      node.start();
+    }catch(e){
+      console.warn('speakOne error:',src,e);
+      resolve();
+    }
   });
 }
 
@@ -541,7 +553,7 @@ async function speakQueue(files, onDone){
 
 function stopSpeech(){
   isSpeaking=false;
-  if(currentAudio){ try{currentAudio.pause(); currentAudio.currentTime=0;}catch(e){} }
+  if(currentSource){ try{currentSource.stop();}catch(e){} currentSource=null; }
   stopBgMusic();
 }
 
@@ -649,13 +661,13 @@ function togglePause(){
   const btn=document.getElementById('pauseBtn');
   if(isPaused){
     btn.textContent='ПРОДОЛЖИТЬ';
-    if(currentAudio) currentAudio.pause();
+    if(audioCtx) audioCtx.suspend();
     if(bgMusicAudio) bgMusicAudio.pause();
     setPhaseLabel('Пауза');
   } else {
     btn.textContent='ПАУЗА';
-    if(currentAudio) currentAudio.play().catch(()=>{});
-    if(bgMusicAudio) bgMusicAudio.play().catch(()=>{});
+    if(audioCtx) audioCtx.resume();
+    if(bgMusicAudio && bgVolume>0) bgMusicAudio.play().catch(()=>{});
     setPhaseLabel('Продолжаем...');
   }
 }
@@ -687,14 +699,21 @@ function updateSilenceDisplay(s){ const m=Math.floor(s/60),sc=s%60; document.get
 
 document.getElementById('bgVolSlider').addEventListener('input',function(){
   bgVolume=parseFloat(this.value);
-  if(bgMusicAudio) bgMusicAudio.volume=bgVolume;
+  if(bgMusicAudio){
+    if(bgVolume===0){ bgMusicAudio.pause(); }
+    else{ bgMusicAudio.volume=bgVolume; if(bgMusicAudio.paused && !isPaused) bgMusicAudio.play().catch(()=>{}); }
+  }
   document.getElementById('bgVolIcon').textContent=bgVolume===0?'🔇':'🎵';
 });
 document.getElementById('bgVolIcon').addEventListener('click',function(){
   const sl=document.getElementById('bgVolSlider');
-  if(bgVolume>0){sl.dataset.prev=bgVolume;sl.value=0;bgVolume=0;}
-  else{bgVolume=parseFloat(sl.dataset.prev||0.03);sl.value=bgVolume;}
-  if(bgMusicAudio) bgMusicAudio.volume=bgVolume;
+  if(bgVolume>0){
+    sl.dataset.prev=bgVolume; sl.value=0; bgVolume=0;
+    if(bgMusicAudio) bgMusicAudio.pause();
+  } else {
+    bgVolume=parseFloat(sl.dataset.prev||0.03); sl.value=bgVolume;
+    if(bgMusicAudio && !isPaused){ bgMusicAudio.volume=bgVolume; bgMusicAudio.play().catch(()=>{}); }
+  }
   this.textContent=bgVolume===0?'🔇':'🎵';
 });
 </script>
