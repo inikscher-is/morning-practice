@@ -307,7 +307,7 @@
     </div>
 
     <button class="start-btn" onclick="startPractice()">НАЧАТЬ ПРАКТИКУ</button>
-    <p class="duration-note">~ 13 минут · голос ElevenLabs</p>
+    <p class="duration-note">~ 13 минут</p>
   </div>
 
   <!-- PRACTICE -->
@@ -425,12 +425,13 @@ const FINISH_AUDIO = ["finish_01","finish_02","finish_03"];
 // ════════════════════════════════════
 // AUDIO ENGINE
 // ════════════════════════════════════
-let audioCtx=null, gainNode=null, masterGain=null, ambiOsc=null, ambiLfo=null;
+let audioCtx=null, masterGain=null;
 let volume=0.7;
 
 function initAudio(){
   if(audioCtx) return;
   audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
   masterGain=audioCtx.createGain();
   masterGain.gain.value=volume;
   masterGain.connect(audioCtx.destination);
@@ -450,31 +451,8 @@ function playGong(){
   });
 }
 
-function startAmbience(){
-  if(!audioCtx) initAudio();
-  stopAmbience();
-  const osc=audioCtx.createOscillator();
-  const lfo=audioCtx.createOscillator();
-  const lfoG=audioCtx.createGain();
-  gainNode=audioCtx.createGain();
-  osc.type='sine'; osc.frequency.value=136.1;
-  lfo.type='sine'; lfo.frequency.value=0.08; lfoG.gain.value=2;
-  lfo.connect(lfoG); lfoG.connect(osc.frequency);
-  gainNode.gain.value=0; osc.connect(gainNode); gainNode.connect(masterGain);
-  osc.start(); lfo.start(); gainNode.gain.linearRampToValueAtTime(0.05,audioCtx.currentTime+4);
-  ambiOsc=osc; ambiLfo=lfo;
-}
-
-function stopAmbience(){
-  if(ambiOsc){
-    try{
-      gainNode.gain.linearRampToValueAtTime(0,audioCtx.currentTime+1.5);
-      const o=ambiOsc, l=ambiLfo;
-      setTimeout(()=>{try{o.stop();l.stop();}catch(e){}},1600);
-    }catch(e){}
-    ambiOsc=null; ambiLfo=null;
-  }
-}
+function startAmbience(){}
+function stopAmbience(){}
 
 // ════════════════════════════════════
 // BACKGROUND MUSIC
@@ -485,8 +463,8 @@ function startBgMusic(src){
   stopBgMusic();
   bgMusicAudio=new Audio(src);
   bgMusicAudio.loop=true;
-  bgMusicAudio.volume=0.15;
-  bgMusicAudio.play().catch(()=>{});
+  bgMusicAudio.volume=0.3;
+  bgMusicAudio.play().catch(e=>console.warn('BgMusic error:',e));
 }
 
 function stopBgMusic(){
@@ -513,12 +491,13 @@ function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
 async function speakOne(baseId){
   return new Promise(resolve=>{
-    const audio=new Audio(`audio/${baseId}_${selectedVoice}.mp3`);
+    const src=`audio/${baseId}_${selectedVoice}.mp3`;
+    const audio=new Audio(src);
     audio.volume=volume;
     currentAudio=audio;
     audio.onended=resolve;
-    audio.onerror=resolve;
-    audio.play().catch(resolve);
+    audio.onerror=(e)=>{ console.warn('Audio error:', src, e); resolve(); };
+    audio.play().catch(e=>{ console.warn('Play failed:', src, e); resolve(); });
   });
 }
 
@@ -647,13 +626,11 @@ function togglePause(){
     btn.textContent='ПРОДОЛЖИТЬ';
     if(currentAudio) currentAudio.pause();
     if(bgMusicAudio) bgMusicAudio.pause();
-    if(gainNode) gainNode.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.5);
     setPhaseLabel('Пауза');
   } else {
     btn.textContent='ПАУЗА';
-    if(currentAudio) currentAudio.play();
+    if(currentAudio) currentAudio.play().catch(()=>{});
     if(bgMusicAudio) bgMusicAudio.play().catch(()=>{});
-    if(gainNode) gainNode.gain.linearRampToValueAtTime(0.05,audioCtx.currentTime+0.5);
     setPhaseLabel('Продолжаем...');
   }
 }
