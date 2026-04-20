@@ -119,6 +119,20 @@
   }
   .start-btn:hover::before { transform: scaleX(1); }
   .start-btn:hover { box-shadow: 0 0 30px rgba(201,169,110,0.2); }
+  /* Voice selection */
+  .voice-section { margin-bottom: 28px; width: 100%; text-align: left; }
+  .voice-label { font-family: 'Cinzel', serif; font-size: 0.63rem; letter-spacing: 0.22em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 12px; display: block; }
+  .voice-options { display: flex; gap: 10px; }
+  .voice-btn {
+    flex: 1; background: transparent; border: 1px solid rgba(201,169,110,0.2);
+    color: var(--cream-dim); font-family: 'Cormorant Garamond', serif; font-size: 1rem;
+    padding: 14px 10px; cursor: pointer; transition: all 0.3s ease; border-radius: 2px; text-align: center; line-height: 1.4;
+  }
+  .voice-btn:hover { border-color: rgba(201,169,110,0.5); color: var(--cream); }
+  .voice-btn.selected { border-color: var(--gold); color: var(--gold-light); background: rgba(201,169,110,0.07); box-shadow: 0 0 20px rgba(201,169,110,0.1); }
+  .voice-btn .voice-name { font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.1em; display: block; margin-bottom: 3px; }
+  .voice-btn .voice-desc { font-size: 0.78rem; color: var(--gold-dim); font-style: italic; display: block; }
+
   .duration-note { margin-top: 14px; font-size: 0.82rem; color: var(--cream-dim); font-style: italic; }
 
   /* ── PRACTICE ── */
@@ -277,6 +291,20 @@
       <div class="step-preview-item"><span class="step-num">V</span><span class="step-title-preview">Поиск подтверждений</span><span class="step-time">3 мин</span></div>
     </div>
 
+    <div class="voice-section">
+      <label class="voice-label">Выберите голос</label>
+      <div class="voice-options">
+        <button class="voice-btn selected" id="voiceMarina" onclick="selectVoice('marina')">
+          <span class="voice-name">♀ Марина</span>
+          <span class="voice-desc">мягкий · женский</span>
+        </button>
+        <button class="voice-btn" id="voiceMaxim" onclick="selectVoice('maxim')">
+          <span class="voice-name">♂ Максим</span>
+          <span class="voice-desc">глубокий · мужской</span>
+        </button>
+      </div>
+    </div>
+
     <button class="start-btn" onclick="startPractice()">НАЧАТЬ ПРАКТИКУ</button>
     <p class="duration-note">~ 13 минут · голос ElevenLabs</p>
   </div>
@@ -336,7 +364,7 @@
 const STEPS = [
   {
     number:"I", title:"Дыхание\nПерезагрузка нервной системы", icon:"🌬", orbClass:"breathing",
-    duration:120, silenceDuration:60,
+    duration:120, silenceDuration:60, bgMusic:"audio/sigmamusicart-meditation-meditation-music-514539.mp3",
     instruction:"Сядьте удобно. Закройте глаза. Сделайте вдох через нос — задержите — короткий дополнительный вдох — и медленный долгий выдох через рот. Вы переключаетесь из режима стресса в режим открытости.",
     audioFiles:[
       "audio/s1_marina_01.mp3","audio/s1_marina_02.mp3","audio/s1_marina_03.mp3",
@@ -352,7 +380,7 @@ const STEPS = [
   },
   {
     number:"II", title:"Сердечная\nКогерентность", icon:"❤", orbClass:"pulsing",
-    duration:180, silenceDuration:90,
+    duration:180, silenceDuration:90, bgMusic:"audio/sigmamusicart-meditation-meditation-music-514539.mp3",
     instruction:"Перенесите внимание в центр груди. Дышите медленно через сердце. Вспомните момент настоящей благодарности или любви. Позвольте этому чувству расшириться. Удерживайте его.",
     audioFiles:[
       "audio/s2_marina_01.mp3","audio/s2_marina_02.mp3","audio/s2_marina_03.mp3",
@@ -367,7 +395,7 @@ const STEPS = [
   },
   {
     number:"III", title:"Декларация\nНовой Идентичности", icon:"✦", orbClass:"",
-    duration:180, silenceDuration:90,
+    duration:180, silenceDuration:90, bgMusic:"audio/the_mountain-meditation-background-443554.mp3",
     instruction:"Из состояния тепла и открытости произнесите вслух одну сильную декларацию. Не кем вы хотите стать — а кем вы уже являетесь прямо сейчас. Прочувствуйте каждое слово.",
     audioFiles:[
       "audio/s3_marina_01.mp3","audio/s3_marina_02.mp3","audio/s3_marina_03.mp3",
@@ -382,7 +410,7 @@ const STEPS = [
   },
   {
     number:"IV", title:"Защита\nСостояния", icon:"🛡", orbClass:"",
-    duration:120, silenceDuration:60,
+    duration:120, silenceDuration:60, bgMusic:"audio/sigmamusicart-meditation-meditation-music-514539.mp3",
     instruction:"Представьте свой предстоящий день. Увидьте себя — уже в новом состоянии — в каждой встрече, каждом разговоре. Установите намерение: при любом отклонении вы возвращаетесь к себе.",
     audioFiles:[
       "audio/s4_marina_01.mp3","audio/s4_marina_02.mp3","audio/s4_marina_03.mp3",
@@ -397,7 +425,7 @@ const STEPS = [
   },
   {
     number:"V", title:"Поиск\nПодтверждений", icon:"🌟", orbClass:"",
-    duration:180, silenceDuration:90,
+    duration:180, silenceDuration:90, bgMusic:"audio/sigmamusicart-meditation-meditation-music-514539.mp3",
     instruction:"Активируйте режим поиска. Сегодня вы будете замечать всё, что подтверждает вашу новую идентичность. Мозг начинает видеть то, во что вы верите. Завершите тремя словами благодарности.",
     audioFiles:[
       "audio/s5_marina_01.mp3","audio/s5_marina_02.mp3","audio/s5_marina_03.mp3",
@@ -469,6 +497,34 @@ function stopAmbience(){
 }
 
 // ════════════════════════════════════
+// BACKGROUND MUSIC
+// ════════════════════════════════════
+let bgMusicAudio=null;
+
+function startBgMusic(src){
+  stopBgMusic();
+  bgMusicAudio=new Audio(src);
+  bgMusicAudio.loop=true;
+  bgMusicAudio.volume=0.15;
+  bgMusicAudio.play().catch(()=>{});
+}
+
+function stopBgMusic(){
+  if(bgMusicAudio){ bgMusicAudio.pause(); bgMusicAudio.currentTime=0; bgMusicAudio=null; }
+}
+
+// ════════════════════════════════════
+// VOICE SELECTION
+// ════════════════════════════════════
+let selectedVoice='marina';
+
+function selectVoice(voice){
+  selectedVoice=voice;
+  document.getElementById('voiceMarina').classList.toggle('selected', voice==='marina');
+  document.getElementById('voiceMaxim').classList.toggle('selected', voice==='maxim');
+}
+
+// ════════════════════════════════════
 // PLAYBACK
 // ════════════════════════════════════
 let currentAudio=null, isSpeaking=false, isPaused=false;
@@ -494,7 +550,7 @@ async function speakQueue(files, onDone){
     setPhaseLabel('Слушайте...', true);
     await speakOne(files[i]);
     if(!isSpeaking) break;
-    await sleep(800);
+    await sleep(2000);
   }
   isSpeaking=false;
   if(onDone) onDone();
@@ -503,6 +559,7 @@ async function speakQueue(files, onDone){
 function stopSpeech(){
   isSpeaking=false;
   if(currentAudio){ try{currentAudio.pause(); currentAudio.currentTime=0;}catch(e){} }
+  stopBgMusic();
 }
 
 // ════════════════════════════════════
@@ -561,6 +618,7 @@ function loadStep(idx){
 
 function runStep(step){
   startAmbience();
+  startBgMusic(step.bgMusic);
   clearInterval(stepTimer);
   stepTimer=setInterval(()=>{ if(!isPaused){ stepTimeLeft=Math.max(0,stepTimeLeft-1); updateTimerDisplay(stepTimeLeft); } },1000);
   speakQueue(step.audioFiles, ()=>{
@@ -608,11 +666,13 @@ function togglePause(){
   if(isPaused){
     btn.textContent='ПРОДОЛЖИТЬ';
     if(currentAudio) currentAudio.pause();
+    if(bgMusicAudio) bgMusicAudio.pause();
     if(gainNode) gainNode.gain.linearRampToValueAtTime(0,audioCtx.currentTime+0.5);
     setPhaseLabel('Пауза');
   } else {
     btn.textContent='ПАУЗА';
     if(currentAudio) currentAudio.play();
+    if(bgMusicAudio) bgMusicAudio.play().catch(()=>{});
     if(gainNode) gainNode.gain.linearRampToValueAtTime(0.05,audioCtx.currentTime+0.5);
     setPhaseLabel('Продолжаем...');
   }
@@ -647,6 +707,7 @@ document.getElementById('volSlider').addEventListener('input',function(){
   volume=parseFloat(this.value);
   if(masterGain) masterGain.gain.value=volume;
   if(currentAudio) currentAudio.volume=volume;
+  if(bgMusicAudio) bgMusicAudio.volume=volume*0.2;
   document.getElementById('volIcon').textContent=volume===0?'🔇':volume<0.35?'🔉':'🔔';
 });
 document.getElementById('volIcon').addEventListener('click',function(){
@@ -655,6 +716,7 @@ document.getElementById('volIcon').addEventListener('click',function(){
   else{volume=parseFloat(sl.dataset.prev||0.7);sl.value=volume;}
   if(masterGain) masterGain.gain.value=volume;
   if(currentAudio) currentAudio.volume=volume;
+  if(bgMusicAudio) bgMusicAudio.volume=volume*0.2;
   this.textContent=volume===0?'🔇':'🔔';
 });
 </script>
