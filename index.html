@@ -246,10 +246,9 @@
   @keyframes gongFlash { 0%{opacity:1} 100%{opacity:0} }
 
   /* Volume */
-  .volume-wrap { position: fixed; top: 18px; right: 18px; z-index: 20; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-  .vol-row { display: flex; align-items: center; gap: 8px; }
-  .vol-icon { font-size: 1rem; color: var(--gold-dim); cursor: pointer; padding: 4px; }
+  .volume-wrap { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 8px; }
   .vol-label { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--gold-dim); text-transform: uppercase; }
+  .vol-icon { font-size: 1rem; color: var(--gold-dim); cursor: pointer; padding: 4px; }
   input[type=range].vol-slider { width: 80px; accent-color: var(--gold); opacity: 0.6; cursor: pointer; }
   input[type=range].vol-slider:hover { opacity: 1; }
 
@@ -271,11 +270,9 @@
 <div class="gong-flash" id="gongFlash"></div>
 
 <div class="volume-wrap">
-  <div class="vol-row">
-    <span class="vol-label">Stimme</span>
-    <span class="vol-icon" id="volIcon">🔔</span>
-    <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.05" value="0.85">
-  </div>
+  <span class="vol-label">Musik</span>
+  <span class="vol-icon" id="bgVolIcon">🎵</span>
+  <input type="range" class="vol-slider" id="bgVolSlider" min="0" max="0.3" step="0.01" value="0.03">
 </div>
 
 <!-- Silence overlay -->
@@ -454,14 +451,14 @@ const FINISH_AUDIO = ["finish_01","finish_02","finish_03"];
 // AUDIO ENGINE
 // ════════════════════════════════════
 let audioCtx=null, masterGain=null;
-let volume=0.85;
+let bgVolume=0.03;
 
 function initAudio(){
   if(audioCtx) return;
   audioCtx=new(window.AudioContext||window.webkitAudioContext)();
   if(audioCtx.state==='suspended') audioCtx.resume();
   masterGain=audioCtx.createGain();
-  masterGain.gain.value=volume;
+  masterGain.gain.value=1;
   masterGain.connect(audioCtx.destination);
 }
 
@@ -491,7 +488,7 @@ function startBgMusic(src){
   stopBgMusic();
   bgMusicAudio=new Audio(src);
   bgMusicAudio.loop=true;
-  bgMusicAudio.volume=0.07;
+  bgMusicAudio.volume=bgVolume;
   bgMusicAudio.play().catch(e=>console.warn('BgMusic error:',e));
 }
 
@@ -522,7 +519,7 @@ async function speakOne(baseId){
   return new Promise(resolve=>{
     const src=`audio/${baseId}_${selectedVoice}.mp3`;
     const audio=new Audio(src);
-    audio.volume=volume;
+    audio.volume=1.0;
     currentAudio=audio;
     audio.onended=resolve;
     audio.onerror=(e)=>{ console.warn('Audio error:', src, e); resolve(); };
@@ -690,19 +687,17 @@ function setPhaseLabel(text, dots){
 function updateTimerDisplay(s){ const m=Math.floor(s/60),sc=s%60; document.getElementById('timerDisplay').textContent=`${m}:${sc.toString().padStart(2,'0')}`; }
 function updateSilenceDisplay(s){ const m=Math.floor(s/60),sc=s%60; document.getElementById('silenceTimer').textContent=`${m}:${sc.toString().padStart(2,'0')}`; }
 
-document.getElementById('volSlider').addEventListener('input',function(){
-  volume=parseFloat(this.value);
-  if(masterGain) masterGain.gain.value=volume;
-  if(currentAudio) currentAudio.volume=volume;
-  document.getElementById('volIcon').textContent=volume===0?'🔇':volume<0.35?'🔉':'🔔';
+document.getElementById('bgVolSlider').addEventListener('input',function(){
+  bgVolume=parseFloat(this.value);
+  if(bgMusicAudio) bgMusicAudio.volume=bgVolume;
+  document.getElementById('bgVolIcon').textContent=bgVolume===0?'🔇':'🎵';
 });
-document.getElementById('volIcon').addEventListener('click',function(){
-  const sl=document.getElementById('volSlider');
-  if(volume>0){sl.dataset.prev=volume;sl.value=0;volume=0;}
-  else{volume=parseFloat(sl.dataset.prev||0.85);sl.value=volume;}
-  if(masterGain) masterGain.gain.value=volume;
-  if(currentAudio) currentAudio.volume=volume;
-  this.textContent=volume===0?'🔇':'🔔';
+document.getElementById('bgVolIcon').addEventListener('click',function(){
+  const sl=document.getElementById('bgVolSlider');
+  if(bgVolume>0){sl.dataset.prev=bgVolume;sl.value=0;bgVolume=0;}
+  else{bgVolume=parseFloat(sl.dataset.prev||0.03);sl.value=bgVolume;}
+  if(bgMusicAudio) bgMusicAudio.volume=bgVolume;
+  this.textContent=bgVolume===0?'🔇':'🎵';
 });
 </script>
 </body>
