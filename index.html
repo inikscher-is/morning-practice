@@ -57,13 +57,13 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 80px 20px 40px;
+    padding: 60px 20px 40px;
   }
 
   /* ── START ── */
   #startScreen { text-align: center; max-width: 480px; width: 100%; }
 
-  .ornament { color: var(--gold); font-size: 0.6rem; letter-spacing: 0.3rem; margin-bottom: 8px; opacity: 0.6; }
+  .ornament { color: var(--gold); font-size: 0.6rem; letter-spacing: 0.3rem; margin-bottom: 12px; opacity: 0.6; }
 
   h1 {
     font-family: 'Cinzel', serif;
@@ -245,7 +245,7 @@
   @keyframes gongFlash { 0%{opacity:1} 100%{opacity:0} }
 
   /* Volume */
-  .volume-wrap { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); z-index: 60; display: flex; align-items: center; gap: 8px; }
+  .volume-wrap { position: fixed; top: 18px; right: 18px; z-index: 60; display: flex; align-items: center; gap: 8px; }
   .vol-label { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.15em; color: var(--gold-dim); text-transform: uppercase; }
   .vol-icon { font-size: 1rem; color: var(--gold-dim); cursor: pointer; padding: 4px; }
   input[type=range].vol-slider { width: 80px; accent-color: var(--gold); opacity: 0.6; cursor: pointer; }
@@ -269,7 +269,6 @@
 <div class="gong-flash" id="gongFlash"></div>
 
 <div class="volume-wrap">
-  <span class="vol-label">Musik</span>
   <span class="vol-icon" id="bgVolIcon">🎵</span>
   <input type="range" class="vol-slider" id="bgVolSlider" min="0" max="0.3" step="0.01" value="0.03">
 </div>
@@ -291,7 +290,7 @@
 
   <!-- START -->
   <div id="startScreen">
-    <div class="ornament">✦ ✦ ✦</div>
+    <div class="ornament" style="margin-top:0;">✦ ✦ ✦</div>
     <h1>Утренняя<br>Практика</h1>
     <p class="subtitle">5 шагов к новому состоянию</p>
 
